@@ -5,7 +5,7 @@
   </div>
 
   <!-- Meio rolável -->
-  <div class="flex-grow-1 overflow-auto my-3" style="min-height: 0;">
+  <div class="flex-grow-1 overflow-auto my-3" style="min-height: 0;" *ngIf="rankings.length > 0">
     <div *ngFor="let r of rankings; let i = index" class="card mb-2 shadow-sm border-0 rounded-3">
       <div class="card-body d-flex justify-content-between align-items-center">
         <div>
@@ -20,6 +20,9 @@
         <span class="fw-bold text-primary fs-5">{{ r.score }}</span>
       </div>
     </div>
+  </div>
+  <div *ngIf="rankings.length === 0">
+    Ainda não há dados para serem exibidos.
   </div>
 
   <!-- Rodapé fixo dentro da viewport -->
