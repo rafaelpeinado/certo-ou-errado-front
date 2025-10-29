@@ -19,6 +19,7 @@ export class QuestionComponent implements OnInit {
   public correctedPhrase: string = '';
   public answerResult: boolean | null = null;
   public answered: boolean = false;
+  public finalMessage!: string;
 
   private startTime: number = Date.now();
 
@@ -42,22 +43,24 @@ export class QuestionComponent implements OnInit {
 
   public answer(answer: boolean): void {
     this.answered = true;
+    this.showAlert = false;
     this.answerResult = answer === this.question.isCorrect;
 
     if (this.answerResult) {
       this.totalPoints += this.CORRECT_ANSWER_POINTS;
-      alert('Você acertou!');
+      this.showAlertWithStyle('success', `Você acertou a frase ${this.actualPage}!`);
       this.next();
       return;
     }
 
     if (this.question.isCorrect && this.answerResult != null && !this.answerResult) {
-      alert('Você errou!');
+      this.showAlertWithStyle('danger', `Você errou a frase ${this.actualPage}!`);
       this.next();
       return;
     }
 
-    alert('Infelizmente a resposta está errada. Escreva a frase corretamente.');
+    this.saveStatus();
+    this.showAlertWithStyle('warning', `Infelizmente está errado. Corrija a frase ${this.actualPage}.`);
   }
 
   public send(): void {
@@ -65,16 +68,12 @@ export class QuestionComponent implements OnInit {
       const correctedPhrase: string = this.patternPhrase(this.correctedPhrase);
       const correctPhrase: string = this.patternPhrase(this.question.correctPhrase);
 
-      let text: string;
-
       if (correctedPhrase.includes(correctPhrase)) {
-        text = 'Parabéns! Você corrigiu a frase corretamente.';
+        this.showAlertWithStyle('success', `Parabéns! Você corrigiu a frase ${this.actualPage} corretamente.`);
         this.totalPoints += this.CORRECT_PHRASE_POINTS;
       } else {
-        text = 'A frase corrigida está incorreta.';
+        this.showAlertWithStyle('danger', `Infelizmente você errou na correção da frase ${this.actualPage}.`);
       }
-
-      alert(text);
       this.next();
     }
   }
@@ -87,10 +86,12 @@ export class QuestionComponent implements OnInit {
       if (user) {
         this.rankingService.createRanking(this.createRankingRequest(user.id, finalPoints, finalTime))
           .subscribe(() => {
-            alert('Você finalizou o questionário. Obrigado por participar! Pontos: ' + finalPoints + ' Tempo: ' + this.formatMs(finalTime));
             this.clearStatus();
             this.quizService.clearQuestions();
-            this.router.navigate([`/${AppRoutes.RANKING}`]);
+            this.finishQuiz(finalPoints, finalTime);
+            setTimeout(() => {
+              this.router.navigate([`/${AppRoutes.RANKING}`]);
+            }, 5000)
           });
       } else {
         this.router.navigate([`/${AppRoutes.LOGIN}`]);
@@ -127,7 +128,11 @@ export class QuestionComponent implements OnInit {
   }
 
   private patternPhrase(phrase: string): string {
-    return phrase.replaceAll(/\s+/g, ' ').toLocaleLowerCase()
+    return phrase
+      .replaceAll(/\s+/g, ' ')      // substitui múltiplos espaços por um único espaço
+      .replaceAll(/\.+$/g, '')      // remove pontos finais no fim da frase
+      .toLocaleLowerCase()          // converte para minúsculas
+      .trim();                      // remove espaços do início e fim
   }
 
   private createRankingRequest(userId: number, score: number, timeMs: number) {
@@ -143,6 +148,8 @@ export class QuestionComponent implements OnInit {
       actualPage: this.actualPage,
       totalPoints: this.totalPoints,
       startTime: this.startTime,
+      answerResult: this.answerResult,
+      answered: this.answered,
     }));
   }
 
@@ -153,10 +160,32 @@ export class QuestionComponent implements OnInit {
       this.actualPage = status.actualPage;
       this.totalPoints = status.totalPoints;
       this.startTime = status.startTime;
+      this.answerResult = status.answerResult;
+      this.answered = status.answered;
     }
   }
 
   private clearStatus(): void {
     localStorage.removeItem(this.STORAGE_KEY);
   }
+
+  showAlert = false;
+  alertMessage = '';
+  alertClass = 'alert-success';
+
+  private showAlertWithStyle(type: 'success' | 'danger' | 'warning', message: string): void {
+    this.alertClass = `alert-${type}`;
+    this.alertMessage = message;
+    this.showAlert = true;
+  }
+
+  private finishQuiz(finalPoints: number, finalTime: number): void {
+    this.finalMessage = `
+    <h4 class="fw-bold">Parabéns!</h4>
+    Obrigado por participar!<br>
+    Pontos: <strong>${finalPoints.toFixed(2)}</strong><br>
+    Tempo: <strong>${this.formatMs(finalTime)}</strong>
+  `;
+  }
+
 }
