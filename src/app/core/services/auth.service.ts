@@ -19,6 +19,6 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.KEY);
+    localStorage.clear();
   }
 }

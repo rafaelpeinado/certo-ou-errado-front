@@ -89,6 +89,7 @@ export class QuestionComponent implements OnInit {
           .subscribe(() => {
             alert('Você finalizou o questionário. Obrigado por participar! Pontos: ' + finalPoints + ' Tempo: ' + this.formatMs(finalTime));
             this.clearStatus();
+            this.quizService.clearQuestions();
             this.router.navigate([`/${AppRoutes.RANKING}`]);
           });
       } else {

@@ -50,4 +50,8 @@ export class QuizService {
     }
     return selected;
   }
+
+  public clearQuestions(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
+  }
 }
