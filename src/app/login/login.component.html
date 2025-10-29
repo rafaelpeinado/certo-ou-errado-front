@@ -1,0 +1,58 @@
+<div class="card shadow-sm p-2">
+  <div class="card-body">
+    <h2 class="h5">Acesso ao Jogo</h2>
+    <p class="mt-3 mb-2 fw-semibold">Insira seus dados para entrar</p>
+    <form class="d-grid gap-2" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="name" class="form-label">Nome completo</label>
+        <input type="text" id="name" class="form-control" formControlName="name" placeholder="Ex.: Maria Souza"
+          autocomplete="name" />
+        <small class="text-danger" *ngIf="hasError('name','required')">
+          Informe seu nome completo.
+        </small>
+      </div>
+      <div>
+        <label for="student" class="form-label">Você é</label>
+        <select class="form-select" id="student" aria-label="Tipo de usuário" formControlName="student">
+          <option value="" selected disabled hidden>Selecione...</option>
+          <option [value]="typeUserEnum.STUDENT">Aluno</option>
+          <option [value]="typeUserEnum.VISITOR">Visitante</option>
+        </select>
+        <small class="text-danger" *ngIf="hasError('student','required')">
+          Selecione uma opção.
+        </small>
+      </div>
+      <div *ngIf="form.get('student')?.value === typeUserEnum.STUDENT">
+        <div>
+          <label for="class" class="form-label">Turma</label>
+          <input type="text" class="form-control" id="class" formControlName="class" placeholder="Ex.: ABC12" />
+          <small class="text-danger" *ngIf="hasError('class','required')">
+            Informe a turma.
+          </small>
+          <small class="text-danger" *ngIf="hasError('class','minlength')">
+            Mínimo de 2 caracteres.
+          </small>
+        </div>
+      </div>
+      <div>
+        <label for="age" class="form-label">Idade</label>
+        <input type="text" id="age" class="form-control" formControlName="age" inputmode="numeric"
+          placeholder="Ex.: 15" />
+        <small class="text-danger" *ngIf="hasError('age','required')">
+          Informe sua idade.
+        </small>
+        <small class="text-danger" *ngIf="hasError('age','pattern')">
+          Use apenas números.
+        </small>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="awareCheck" formControlName="awareCheck" />
+        <label class="form-check-label" for="awareCheck">
+          Estou ciente que minhas informações serão usadas apenas para o cadastro no jogo.
+        </label>
+      </div>
+      <div class="d-grid gap-2 mt-2">
+        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Entrar</button>
+      </div>
+    </form>
+  </div>

@@ -1,0 +1,18 @@
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h2 class="h5">{{ actualPage }}) {{ question.phrase }}</h2>
+    <p class="mt-3 mb-2 fw-semibold">A frase está?</p>
+    <div class="d-grid gap-2">
+      <button class="btn btn-success" (click)="answer(true)" [disabled]="answered">Correta</button>
+      <button class="btn btn-danger" (click)="answer(false)" [disabled]="answered">Errada</button>
+    </div>
+
+    <div class="mt-4 d-grid gap-2" *ngIf="!this.question.isCorrect && this.answerResult != null && !this.answerResult">
+      <div>
+        <label for="prhase" class="form-label">Escreva a frase corretamente:</label>
+        <input type="text" class="form-control" id="prhase" [(ngModel)]="this.correctedPhrase" />
+      </div>
+      <button class="btn btn-primary" (click)="send()" [disabled]="this.correctedPhrase.length === 0">Enviar</button>
+    </div>
+  </div>
+</div>
