@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { AppRoutes } from '../shared/app-routes.enum';
 import { AuthService } from '../core/services/auth.service';
 import { User, UserRequest } from '../core/interfaces/user.interface';
-import { of, switchMap } from 'rxjs';
+import { finalize, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +16,7 @@ import { of, switchMap } from 'rxjs';
 export class LoginComponent implements OnInit {
   public form!: FormGroup;
   public typeUserEnum = TypeUserEnum;
+  public isLoading: boolean = false;
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -48,10 +49,12 @@ export class LoginComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
+    this.isLoading = true;
     const req: UserRequest = this.createUserRequest(this.form.value);
     this.userService.getUser(req)
       .pipe(
         switchMap(user => user ? of(user) : this.userService.createUser(req)),
+        finalize(() => this.isLoading = false),
       )
       .subscribe((user: User) => {
         this.authService.login(user);

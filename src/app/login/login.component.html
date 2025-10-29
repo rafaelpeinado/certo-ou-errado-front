@@ -52,7 +52,12 @@
         </label>
       </div>
       <div class="d-grid gap-2 mt-2">
-        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Entrar</button>
+        <button class="btn btn-primary" type="submit" [disabled]="form.invalid || isLoading">
+          <div *ngIf="!isLoading">Entrar</div>
+          <div *ngIf="isLoading" class="spinner-border" role="status">
+            <span class="visually-hidden">Entrando...</span>
+          </div>
+        </button>
       </div>
     </form>
   </div>
